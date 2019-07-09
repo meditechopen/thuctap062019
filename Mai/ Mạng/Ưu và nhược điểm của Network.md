@@ -1,9 +1,0 @@
-# Ưu điểm  
-* Tiết kiệm chi phí phần cứng 
-* Chia sẻ dữ liệu cho nhau 
-* Tập trung dữ liệu 
-* Trao đổi dễ dàng hơn. 
-# Nhược điểm 
-* Chi phí xây dựng cao 
-* Lỗi mạng
-* Khả năng lây lan virus và phần mềm độc hại 
