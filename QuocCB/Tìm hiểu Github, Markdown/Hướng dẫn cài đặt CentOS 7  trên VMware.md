@@ -21,10 +21,33 @@
 
 <img src=https://i.imgur.com/HBk5dWD.jpg>
 
+- Bấm vào **Begin Installation** để bắt đầu cài đặt.
+
+<img src=https://i.imgur.com/HpJTd2A.png>
+
+- Thiết lập password cho root.
+
+<img src=https://i.imgur.com/Tfa1n2t.png>
+
+- Thiết lập User.
+
+<img src=https://i.imgur.com/SPDHBgC.png>
+
+<img src=https://i.imgur.com/DzKEyX7.png>
+
+
+
 **3. Hoàn thành**
 
-- Khởi động lại CentOS và bạn phải cài  đặt một số thông tin như license, ngôn ngữ,...
-- Tiến hành cài đặt theo hướng dẫn.
+- Sau khi cài đặt hoàn tất nhấn vào **Reboot** để khởi động lại CentOS.
+
+<img src=https://i.imgur.com/kL6LpMM.png>
+
+- Để yên cho hệ điều hành tự khởi động.
+
+<img src=https://i.imgur.com/Kk9cWZ8.png>
+
+
 - Sau khi hoàn thành ta có giao diện CentOS 7.
 
 <img src=https://i.imgur.com/V54EF6n.png>
