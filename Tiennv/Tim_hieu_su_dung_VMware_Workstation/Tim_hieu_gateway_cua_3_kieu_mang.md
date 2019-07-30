@@ -18,11 +18,11 @@ Khi bạn cài 1 máy ảo trong VMware và để card mạng ở chế độ Ho
 
 #### Chế độ NAT
 
-Ở chế độ này, card mạng của máy ảo kết nối với VMnet8, VNnet8 cho phép máy ảo đi ra mạng vật lý bên ngoài internet thông qua cơ chế NAT (NAT device) và máy thật sẽ đóng vai trò NAT server cho các máy ảo. Lúc này lớp mạng bên trong máy ảo khác hoàn toàn với lớp mạng của card vật lý bên ngoài, hai mạng hoàn toàn tách biệt, máy ảo sẽ được cấu hình NAT và sử dụng IP của máy thật để giao tiếp với mạng ngoài. IP của card mạng máy ảo sẽ được cấp bởi DHCP của VMnet8, trong trường hợp bạn muốn thiết lập IP tĩnh cho card mạng máy ảo bạn phải đảm bảo chung lớp mạng với VNnet8 thì máy ảo mới có thể kết nối internet. Do vậy, gateway cảu máy ảo sẽ là gateway của card mạng ảo được gán cho máy đó.
+Ở chế độ này, card mạng của máy ảo kết nối với VMnet8, VNnet8 cho phép máy ảo đi ra mạng vật lý bên ngoài internet thông qua cơ chế NAT (NAT device) và máy thật sẽ đóng vai trò NAT server cho các máy ảo. Lúc này lớp mạng bên trong máy ảo khác hoàn toàn với lớp mạng của card vật lý bên ngoài, hai mạng hoàn toàn tách biệt, máy ảo sẽ được cấu hình NAT và sử dụng IP của máy thật để giao tiếp với mạng ngoài. IP của card mạng máy ảo sẽ được cấp bởi DHCP của VMnet8, trong trường hợp bạn muốn thiết lập IP tĩnh cho card mạng máy ảo bạn phải đảm bảo địa chỉ IP cùng chung lớp mạng với VNnet8 thì máy ảo mới có thể kết nối internet. Về nguyên tắc bạn có thể cho rằng VMware cũng sẽ tự tạo ra một NIC ảo trên máy thật (như là 2 NIC ảo VMwareNetwork  Adapter VMnet1  và  8) để làm gateway rồi NAT giữa gateway này và NIC thật nhưng trên thực tế VMwaređã không làm như vậy, thay vào đó nó tạo ra một virtual NAT device làm gateway. Lẽ dĩ nhiên NAT device cũng phải có địa chỉ IP như NIC vậy nhưng bạn không thể cấu hình nó như một NIC được. Trong Windows nếu vào Control Panel\Network Connection bạn sẽ không tìm thấy NAT device này.
 
 <img src="img/09.png">
 
-Và bạn có thể thay đổi dải mạng cũng như điacj chỉ gateway này bằng cách vào menu menu `Edit` -> `Virtual Network Editor…` chọn `Change Settings` rồi `Yes`
+Nếu muốn thay đổi dải mạng cũng như địa chỉ gateway này, ta có thể truy cập vào menu `Edit` -> `Virtual Network Editor…` chọn `Change Settings` rồi `Yes`
 
 <img src="img/01.png">
 
