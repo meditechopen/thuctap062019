@@ -12,8 +12,10 @@ B1: Chọn máy ảo muốn clone rồi chọn menu `VM` -> `Manage` -> `Clone..
 <img src="img/26.png">
 
 B2: Hộp thoại `Clone Virtual Machine Wizard` xuất hiên, bấm `Next` để tiếp tục. Tại đây có 2 lựa chọn là `The current state in the virtual machine` và `An existing snapshot`.
-	- Lựa chọn đầu tiên cho phép bạn clone máy ảo ngay tại trạng thái hiện tại của máy ảo gốc, tùy chọn này làm việc ngay cả khi máy ảo đang hoạt động.
-	- Lựa chọn thứ 2 là clone từ 1 bản snapshot có sẵn của máy ảo gốc. (Snapshot của VMware là bản sao của tệp đĩa máy ảo (VMDK) tại một thời điểm nhất định. Snapshot cung cấp bản ghi các thay đổi của ổ đĩa ảo và được sử dụng để khôi phục VM vào một thời điểm cụ thể khi xảy ra sự cố hay lỗi hệ thống). Tùy chọn này chỉ làm việc khi máy ảo ở trạng thái không hoạt động.
+	
+Lựa chọn đầu tiên cho phép bạn clone máy ảo ngay tại trạng thái hiện tại của máy ảo gốc, tùy chọn này làm việc ngay cả khi máy ảo đang hoạt động.
+	
+Lựa chọn thứ 2 là clone từ 1 bản snapshot có sẵn của máy ảo gốc. (Snapshot của VMware là bản sao của tệp đĩa máy ảo (VMDK) tại một thời điểm nhất định. Snapshot cung cấp bản ghi các thay đổi của ổ đĩa ảo và được sử dụng để khôi phục VM vào một thời điểm cụ thể khi xảy ra sự cố hay lỗi hệ thống). Tùy chọn này chỉ làm việc khi máy ảo ở trạng thái không hoạt động.
 
 <img src="img/27.PNG">
 
