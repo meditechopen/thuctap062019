@@ -9,10 +9,10 @@ Nếu đang sử dụng DHCP, địa chỉ IP có thể sẽ bị thay đổi, �
 Để thực hiện advanced NAT và port forwarding trên VMWare, ta làm như sau:
 
 - Truy cập menu`Edit` -> `Virtual Network Editor…` chọn `Change Settings` rồi `Yes`
-<img src="img/01.png">
+<img src="img/01.PNG">
 
 - Chọn `VMnet8` rồi bấm `NAT Settings...`
-<img src="img/13.png">
+<img src="img/13.PNG">
 
 - Tại mục `Port Forwarding` bấm `Add...`
 <img src="img/14.png">
@@ -22,4 +22,4 @@ Nếu đang sử dụng DHCP, địa chỉ IP có thể sẽ bị thay đổi, �
 	- Mục `Virtual machine IP address` điền địa chỉ IP tĩnh của máy ảo
 	- Mục `Virtual port` điền 22 hoặc 23. Đây là 2 port của các giao thức Telnet và SSH cho phép kết nối từ xa.
 	- Cuối cùng bấm `OK` để lưu lại.
-<img src="img/15.png">
+<img src="img/15.PNG">

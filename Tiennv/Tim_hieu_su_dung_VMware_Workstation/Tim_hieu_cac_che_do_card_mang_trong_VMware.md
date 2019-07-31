@@ -1,6 +1,6 @@
 ## Tìm hiểu các chế độ card mạng trong VMware Workstation, sự khác biệt
 
-### VMware Workstation là 1 phần mềm ảo hóa nổi tiếng của công ty VMware Inc. Với VMware Workstation, bạn có thể chạy đồng thời nhiều hệ điều hành cùng lúc trên cùng một PC, giúp cho viêc học tâph nghiên cứu trở nên dễ dàng hơn.
+### VMware Workstation là 1 phần mềm ảo hóa nổi tiếng của công ty VMware Inc. Với VMware Workstation, bạn có thể chạy đồng thời nhiều hệ điều hành cùng lúc trên cùng một PC, giúp cho viêc học tập nghiên cứu trở nên dễ dàng hơn.
 
 Mặc định khi khi cài đặt VMware, phần mềm sẽ cài đặt sẵn cho chúng ta 3 card mạng ảo.
 
@@ -8,12 +8,11 @@ Mặc định khi khi cài đặt VMware, phần mềm sẽ cài đặt sẵn ch
 VMnet1 chế độ Host-only
 VMnet8 chế độ NAT
 
-
 Ta có thể thêm, bớt, chỉnh các option của VMnet bằng cách vào menu `Edit` -> `Virtual Network Editor…` chọn `Change Settings` rồi `Yes`
 
-<img src="img/01.png">
+<img src="img/01.PNG">
 
-<img src="img/02.png">
+<img src="img/02.PNG">
 
 - Chế độ Bridged
 
