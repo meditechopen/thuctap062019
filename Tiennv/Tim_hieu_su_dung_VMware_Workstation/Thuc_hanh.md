@@ -91,3 +91,51 @@ truy cập trang web wwww.google.com từ máy ảo
 <img src="img/56.PNG">
 
 - Cuối cùng bấm `Finish` để kết thúc
+
+5. Tạo một con máy Ubuntu 16, 2 card mạng, cấu hình định tuyến cho ra ngoài mạng (1 Nat, 1 briged)
+
+- Tiến hành cài đặt máy ảo Ubuntu như hướng dẫn [sau](https://github.com/nvtien996/Ubuntu#caidatubuntuserver16.04trenvmware)
+
+- Tại phần `Customize Hardware...` ta tiến hành chỉnh sửa và thêm card mạng cho máy ảo.
+
+- Network Adapter chọn VMnet10 (NAT) vì ta đã cấu hình cho nó ở chế độ NAT như bên [trên](#mot)
+
+<img src="img/57.PNG">
+
+- Bấm `Add...` để thêm thiết bị vào máy ảo, ở đây ta thêm 1 network adapter nữa
+
+<img src="img/58.png">
+
+<img src="img/59.PNG">
+
+chọn chế độ Bridged rồi bấm `Finish`
+
+<img src="img/60.PNG">
+
+- Khi cài đặt, Ubuntu sẽ nhận diện ra 2 card mạng và hỏi bạn xem card nào là chính, ở đây tôi chọn card ens33 là card chính
+
+<img src="img/61.PNG">
+
+- Tiếp tục cài đặt Ubuntu như bình thường
+
+- Khởi động máy ảo và đăng nhập
+
+- Gõ câu lệnh `ip a` để xem các network interfaces trong máy
+
+<img src="img/62.PNG">
+
+- Quan sát thấy card ens34 chưa được khai báo, ta mở file: `/etc/network/interfaces`, rồi add thêm card ens34 chế độ dhcp (cấp phát địa chỉ ip động cho card ens34) bằng câu lệnh `sudo vi /etc/network/interfaces`
+
+<img src="img/63.PNG">
+
+- Lưu lại file cấu hình và gõ câu lệnh `ifup ens34` để bật card ens34 lên
+
+<img src="img/64.PNG">
+
+- Gõ `ip a` để xem lại các thông số trên các network interfaces
+
+<img src="img/65.PNG">
+
+- Ping thử đến trang web google.com từ máy ảo
+
+<img src="img/66.PNG">
