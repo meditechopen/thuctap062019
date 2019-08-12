@@ -1,8 +1,30 @@
 ## User trong Linux
 
-Khái niệm User dùng để định danh cho một người dùng trong hệ thống. User là người có thể truy cập đến hệ thống. User có username và password.
+Khái niệm User dùng để định danh cho một người dùng trong hệ thống. User là người có thể truy cập đến hệ thống.
 
-Có hai loại user: super user và regular user. Với tài khoản super user: root - có thể làm bất cứ điều gì muốn trên hệ thống. Để tạo một người dùng mới, thay đổi thuộc tính của một người dùng cũng như xóa bỏ một người dùng chỉ khi có quyền của root. Mỗi user còn có một định danh riêng gọi là UID. Định danh của người dùng bình thường sử dụng giá trị bắt đầu từ 500.
+User thì có username và password. Mỗi tài khoản người dùng chứa 2 định danh duy nhất: username và UID. Khi tài khoản người dùng được tạo, username của nó được ánh xạ tới một UID duy nhất. Tên người dùng rất linh hoạt nhưng nó phải là duy nhất trong hệ thống. 2 người dùng không thể sử dụng cùng một tên người dùng.
+
+UID là cố định và không thể thay đổi. Sau khi được chỉ định, nó luôn giữ nguyên cho người dùng đó.
+
+Username được sử dụng để truy cập vào tài khoản người dùng, UID được sử dụng để xác thực, theo dỗi và giám sát hoạt động của tài khoản người dùng. Username được sử dụng bởi người dùng còn UID được sử dụng bởi hệ thống.
+
+Có ba loại user: root user, regular user và service user. Mỗi loại user khác nhau có quyền trong hệ thống khác nhau phụ thuộc vào hệ thống đã thiết lập cho họ những quyền gì. Với tài khoản root user - có thể làm bất cứ điều gì muốn trên hệ thống.
+
+- Tài khoản root:
+
+Đây là tài khoản có đặc quyền cao nhất trong hệ thống. Nó được tự động tạo ra trong quá trình cài đặt. Nó có thể làm bất cứ công việc cũng như truy cập bất cứ dịch vụ nào. Tài khoản này dành cho quản trị viên hệ thống và chỉ nên được sử dụng cho mục đích này. Tài khoản root không thể bị xóa, nhưng nếu cần nó có thể bị vô hiệu hóa.
+Tài khoản root có UID bằng 0.
+
+- Tài khoản người dùng thông thường:
+
+Đây là tài khoản của người dùng bình thường. Trong quá trình cài đặt, 1 tài khoản người dùng thông thường sẽ được tạo. Sau khi cài đặt, bạn có thể tạo thêm cái tài khoản thông thường. Tài khoản này có đặc quyền vừa phải, nó chỉ có thể thực hiện các tác vụ được phép và chỉ có thể truy cập các tệp và dịch vụ được trao quyền truy cập. Nó có thể bị vô hiệu hóa hoặc bị xóa khỏi hệ thống.
+Định danh của người dùng bình thường sử dụng giá trị bắt đầu từ 1000.
+
+- Tài khoản dịch vụ:
+
+Tài khoản dịch vụ được tạo bởi các gói cài đặt khi chúng được cài đặt. Các tài khoản này được sử dụng bởi các dịch vụ để chạy các chương trình và thực thi các chức năng.
+
+Để tạo một người dùng mới, thay đổi thuộc tính của một người dùng cũng như xóa bỏ một người dùng chỉ khi có quyền của root.
 
 - Tạo user:
 

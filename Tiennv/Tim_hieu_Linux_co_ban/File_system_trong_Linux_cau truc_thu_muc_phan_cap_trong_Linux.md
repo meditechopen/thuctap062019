@@ -100,3 +100,8 @@ Hình bên dưới là cấu trúc cây thư mục trong Linux:
 | /usr | chứa các file binary, library, tài liệu, source-code cho các chương trình. /usr/bin chứa file binary cho các chương trình của user. Nếu như một user trong quá trình thực thi một lệnh ban đầu sẽ tìm kiếm trong /bin, nếu như không có thì sẽ tiếp tục nhìn vào /usr/bin. Ví dụ một số lệnh như at. awk, cc.../usr/sbin chứa các file binary cho system administrator. Nếu như ta không tìm thấy các file system binary bên dưới /sbin thì ta có thể tìm ở trong /usr/sbin. Ví dụ một số lệnh như cron, sshd, useradd, userdel. /usr/lib chứa các file libraries cho /usr/bin và /usr/sbin. /usr/local dùng để chứa chương trình của các user, các chương trình này được cài đặt từ source. Ví dụ khi ta install apache từ source thì nó sẽ nằm ở vị trí là /usr/local/apache2 |
 | /var | chứa đựng các file có sự thay đổi trong quá trình hoạt động của hệ điều hành cũng như các ứng dụng. Ví dụ: Nhật ký của hệ thống; /var/logdatabase file /var/lib; email /var/mail; Các hàng đợi in ấn: /var/spool; lock file: /var/lock; Các file tạm thời cần cho quá trình reboot: /var/tmp; Dữ liệu cho trang web: /var/www |
 
+Hệ điều hành Linux thì tên các filesystem đều phân biệt chữ hoa chữ thường.
+
+Sơ đồ tree của "/":
+
+<img src="img/10.png">
