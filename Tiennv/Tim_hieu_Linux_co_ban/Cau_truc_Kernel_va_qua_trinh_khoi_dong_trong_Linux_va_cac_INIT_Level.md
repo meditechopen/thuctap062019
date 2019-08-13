@@ -12,7 +12,7 @@ Vì được phát hành với bản quyền GNU - General Public License. Do đ
 
 Linux kernel gồm một số thành phần chính sau:
 
-[Ảnh](https://developer.ibm.com/developer/articles/l-linux-kernel/images/figure3.jpg)
+![Ảnh](https://developer.ibm.com/developer/articles/l-linux-kernel/images/figure3.jpg)
 
 - Giao diện lời gọi hệ thống (System call interface – SCI)
 
@@ -36,7 +36,7 @@ Khi nhiều user sử dụng bộ nhớ, dung lượng có thể không đủ. K
 
 Hệ thống file ảo (VFS) là một khía cạnh hay của nhân Linux, cung cấp một giao diện trừu tượng hoá chung cho hệ thống file. VFS tạo nên một lớp chuyển đổi giữa SCI và các hệ thống file của Linux.
 
-[Ảnh](https://i.imgur.com/VpNgjRn.jpg)
+![Ảnh](https://i.imgur.com/VpNgjRn.jpg)
 
 Nằm trên cùng của VFS là lớp các API các chức năng như mở, đóng, đọc, viết file. Dưới cùng của VFS là lớp trừu tượng hệ thống file xác định các chức năng lớp trên thực hiện như thế nào. Đó là các plug-in đối với một hệ thống file cho trước (có trên 50 plug-in như vậy). Các phần mềm liên quan đến VFS nằm trong thư mục ./linux/fs.
 
@@ -116,4 +116,4 @@ Khi bạn đăng xuất, shell đó và tất cả các tiến trình con của 
 
 Toàn bộ quá trình khởi động của hệ thống Linux được minh họa như hình sau:
 
-[Ảnh](https://i.imgur.com/vjlbvV7.png)
+![Ảnh](https://i.imgur.com/vjlbvV7.png)
