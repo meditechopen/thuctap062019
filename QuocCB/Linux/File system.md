@@ -14,7 +14,7 @@ containing all underlying directories and files, is also called the root directo
 **Subdirectories of root directory**
 
 |**Directory**|**Content**|
-|--------------------------|
+|-------------|-------------|
 |/bin|Common programs, shared by the system, the system administrator and the users|
 |/boot|The startup files and the kernel, vmlinuz. In some recent distributions also grub data. Grub is the GRand Unified Boot loader and is an attempt to get rid of the many different boot-loaders we know today.|
 |/dev|Contains references to all the CPU peripheral hardware, which are represented as files with special properties.|
