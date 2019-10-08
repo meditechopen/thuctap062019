@@ -26,7 +26,7 @@ Hiện nay chúng ta có nftables - một sự thay thế cho IPtables được 
 
 - sử dụng NAT để thực hiện transparent proxies
 
-- hỗ trợ các hệ thống tc và iproute2 được sử dụng để xây dựng các bboj định tuyến theo chính sách và QoS tinh vi
+- hỗ trợ các hệ thống tc và iproute2 được sử dụng để xây dựng các bộ định tuyến theo chính sách và QoS tinh vi
 
 - thực hiệm một số tác vụ (thêm, gây xáo trộn) với packet như thay đổi TOS/DSCP/ECN trong IP header
 
