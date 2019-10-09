@@ -109,7 +109,7 @@ Gói tin sẽ đi qua tất cả các rule chứ không dừng lại khi đã đ
 
 - Rules: bao gồm 1 hay nhiều tiêu chuẩn để xác định packets nào sẽ phải chịu ảnh hưởng và target để xác định hành động nào sẽ được thực thi với packet ấy. Cả 2 yếu tố của rule đó là match và target đều là tùy chọn
 
-Cấu trúc cảu 1 rule trong IPtables như sau:
+Cấu trúc của 1 rule trong IPtables như sau:
 
 `TARGET		PROT		OPT		IN		OUT		SOURCE		DESTINATION`
 
