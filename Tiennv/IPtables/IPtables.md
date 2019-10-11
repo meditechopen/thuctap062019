@@ -316,7 +316,7 @@ netfilter-presistent reload
 Ta có ví dụ 1 số rule như sau:
 
 ```
-target		prot	opt		in		out		source		destination
+target		prot		opt		in		out		source		destination
 ACCEPT		all		--		lo		any		anywhere	anywhere
 ACCEPT     	all		--		any		any		anywhere	anywhere		ctstate RELATED,ESTABLISHED
 ACCEPT    	tcp		--		any		any		anywhere	anywhere		tcp	dpt:ssh
@@ -434,7 +434,7 @@ ví dụ:
 
 ```
 Chain INPUT (policy ACCEPT)
-target		prot	opt		source		destination
+target		prot		opt		source		destination
 ACCEPT		all		--		anywhere	anywhere
 ACCEPT		tcp		--		anywhere	anywhere		tcp dpt:https
 ACCEPT		all		--		anywhere	anywhere		ctstate RELATED,ESTABLISHED
@@ -443,10 +443,10 @@ ACCEPT		tcp		--		anywhere	anywhere		tcp dpt:http
 DROP		all		--		anywhere	anywhere
  
 Chain FORWARD (policy ACCEPT)
-target		prot	opt		source		destination
+target		prot		opt		source		destination
  
 Chain OUTPUT (policy ACCEPT)
-target		prot	opt		source		destination
+target		prot		opt		source		destination
 ```
 ta thấy rule cho phép ssh qua cổng 22 là ở dòng thứ 4 của chain INPUT, vì vậy ta sẽ xóa dòng thứ 4 đi
 
