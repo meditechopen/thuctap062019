@@ -243,17 +243,7 @@ Mỗi chain có thể có 1 hoặc nhiều rule nhưng mặc định nó sẽ c�
 | 12 | | | Đi ra 1 interface |
 | 13 | | | Ra đường truyền |
 
-―――˃PRE――――――˃[ROUTE]―――˃FWD――――――――――˃POST――――――˃ 
-    Conntrack    │       Mangle   ˄    Mangle
-    Mangle       │       Filter   │    NAT (Src)
-    NAT (Dst)    │                │    Conntrack
-    (QDisc)      │             [ROUTE]
-                 ˅                │
-                IN  Filter       OUT Conntrack
-                 │  Conntrack     ˄  Mangle
-                 │  Mangle        │  NAT (Dst)
-                 ˅                │  Filter
-
+<img src="img/05.png">
 
 - Toàn bộ quá trình
 
@@ -326,13 +316,13 @@ netfilter-presistent reload
 Ta có ví dụ 1 số rule như sau:
 
 ```
-target		prot		opt		in		out		source		destination
-ACCEPT		all			--		lo		any		anywhere	anywhere
-ACCEPT     	all  		--  	any    	any     anywhere    anywhere		ctstate RELATED,ESTABLISHED
-ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:ssh
-ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:http
-ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:https
-DROP      	all    		--   	any  	any   	anywhere   	anywhere
+target		prot	opt		in		out		source		destination
+ACCEPT		all		--		lo		any		anywhere	anywhere
+ACCEPT     	all		--		any		any		anywhere	anywhere		ctstate RELATED,ESTABLISHED
+ACCEPT    	tcp		--		any		any		anywhere	anywhere		tcp	dpt:ssh
+ACCEPT    	tcp		--		any		any		anywhere	anywhere		tcp	dpt:http
+ACCEPT    	tcp		--		any		any		anywhere	anywhere		tcp	dpt:https
+DROP      	all		--		any		any		anywhere	anywhere
 ```
 
 Để cho dễ hiểu hơn thì ta cùng đi vào phân tích các rule
@@ -444,19 +434,19 @@ ví dụ:
 
 ```
 Chain INPUT (policy ACCEPT)
-target		prot		opt		source		destination
-ACCEPT		all			--		anywhere	anywhere
-ACCEPT		tcp			--		anywhere	anywhere		tcp dpt:https
-ACCEPT		all			--		anywhere	anywhere		ctstate RELATED,ESTABLISHED
-ACCEPT		tcp			--		anywhere	anywhere		tcp dpt:ssh
-ACCEPT		tcp			--		anywhere	anywhere		tcp dpt:http
-DROP		all			--		anywhere	anywhere
+target		prot	opt		source		destination
+ACCEPT		all		--		anywhere	anywhere
+ACCEPT		tcp		--		anywhere	anywhere		tcp dpt:https
+ACCEPT		all		--		anywhere	anywhere		ctstate RELATED,ESTABLISHED
+ACCEPT		tcp		--		anywhere	anywhere		tcp dpt:ssh
+ACCEPT		tcp		--		anywhere	anywhere		tcp dpt:http
+DROP		all		--		anywhere	anywhere
  
 Chain FORWARD (policy ACCEPT)
-target		prot		opt		source		destination
+target		prot	opt		source		destination
  
 Chain OUTPUT (policy ACCEPT)
-target		prot		opt		source		destination
+target		prot	opt		source		destination
 ```
 ta thấy rule cho phép ssh qua cổng 22 là ở dòng thứ 4 của chain INPUT, vì vậy ta sẽ xóa dòng thứ 4 đi
 
