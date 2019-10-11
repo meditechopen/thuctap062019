@@ -137,13 +137,15 @@ Hệ thống matching của IPtables rất linh hoạt và có thể được m�
 
 - Connection tracking trong IPtables
 
-Connection tracking cho phép IPtables đưa ra quyết định cho mỗi gói tin mà nó nhìn thấy dụa vào ngữ cảnh (context) của kết nối đang diễn ra. Quá trình connection tracking điễn ra khá sớm trong vòng đời (lifecycle) của 1 gói tin. Hệ thống sẽ kiểm tra gói tin với tập hợp các kết nối đang có trên hệ thống, cập nhật trạng thái (state) nếu cần hoặc thêm kết nối mới. Các gói tin được đánh dấu bằng target "NOTRACK" từ RAW table sẽ được bypass quá tình tracking
+Theo dõi kết nối được áp dụng rất sớm sau khi các gói vào networking stack. Chain table RAW và một số kiểm tra sơ bộ cơ bản là logic duy nhất được thực hiện trên các gói trước khi liên kết các gói với kết nối.
+
+Connection tracking cho phép IPtables đưa ra quyết định cho mỗi gói tin mà nó nhìn thấy dựa vào ngữ cảnh (context) của kết nối đang diễn ra. Quá trình connection tracking điễn ra khá sớm trong vòng đời (lifecycle) của 1 gói tin. Hệ thống sẽ kiểm tra gói tin với tập hợp các kết nối đang có trên hệ thống, cập nhật trạng thái (state) nếu cần hoặc thêm kết nối mới. Các gói tin được đánh dấu bằng target "NOTRACK" từ RAW table sẽ được bypass quá tình tracking
 
 - Các trạng thái (state)
 
-Các kết nối được theo dõi bởi hệ thống connection tracking sẽ ở 1 trong các trạng thái sau:
+	Các kết nối được theo dõi bởi hệ thống connection tracking sẽ ở 1 trong các trạng thái sau:
 
-	- NEW: kết nối chỉ có 1 gói tin đầu tiên của 1 kết nối được đánh trạng thái này, áp dugnj cho cả TCP và UDP
+	- NEW: kết nối chỉ có 1 gói tin đầu tiên của 1 kết nối được đánh trạng thái này, áp dụng cho cả TCP và UDP
 	
 	- ESTABLISHED: trạng thái chuyển NEW to ESTABLISHED khi nhận được phản hồi hợp lệ từ phía đối diện của kết nối. Với kết nối TCP, nó chính là SYN/ACK và với UDP/ICMP, là phản hồi mà ở đó địa chỉ nguồn và đích được hoán đổi
 	
@@ -186,6 +188,8 @@ Có rất nhiều các option để thiết lập rule sao cho nó match với p
 Các rule này được gộp lại thành nhóm gọi là chains. Chains là danh sách các rules và nó sẽ được check lần lượt. Khi 1 packet match với 1 rule, nó sẽ được thực thi với hành động tương ứng và không cần phải check với các rule còn lại
 
 Mỗi chain có thể có 1 hoặc nhiều rule nhưng mặc định nó sẽ có 1 policy. Trong trường hợp packets không match với bất cứ rule nào, policy sẽ được thực thi, bạn có thể accept hoặc drop gói
+
+> Lưu ý: Nếu gói tin không khớp với bất cứ rule thuộc chain nào, IPtables sẽ áp dụng "default policy" cho gói tin đó. Mặc định "default policy" của các chain là cho phép gói tin
 
 #### Quá trình xử lý gói tin trong IPtables
 
@@ -239,16 +243,16 @@ Mỗi chain có thể có 1 hoặc nhiều rule nhưng mặc định nó sẽ c�
 | 12 | | | Đi ra 1 interface |
 | 13 | | | Ra đường truyền |
 
---->PRE------>[ROUTE]--->FWD---------->POST------>
-       Conntrack    |       Mangle   ^    Mangle
-       Mangle       |       Filter   |    NAT (Src)
-       NAT (Dst)    |                |    Conntrack
-       (QDisc)      |             [ROUTE]
-                    v                |
-                    IN Filter       OUT Conntrack
-                    |  Conntrack     ^  Mangle
-                    |  Mangle        |  NAT (Dst)
-                    v                |  Filter
+―――˃PRE――――――˃[ROUTE]―――˃FWD――――――――――˃POST――――――˃ 
+    Conntrack    │       Mangle   ˄    Mangle
+    Mangle       │       Filter   │    NAT (Src)
+    NAT (Dst)    │                │    Conntrack
+    (QDisc)      │             [ROUTE]
+                 ˅                │
+                IN  Filter       OUT Conntrack
+                 │  Conntrack     ˄  Mangle
+                 │  Mangle        │  NAT (Dst)
+                 ˅                │  Filter
 
 
 - Toàn bộ quá trình
@@ -257,7 +261,7 @@ Bạn có thể xem ảnh dưới
 
 <img src="img/01.jpg">
 
-Đầu tiên, khi gói tin đi vào từ mạng sẽ qua chain PREROUTING trước. Tại đây gói tin sẽ qua bảng mangle để thay đổi một số thông tin của header, sau đó đi tới bảng NAT để quyết định xem có thay đổi IP đích không (DNAT), tiếp theo sẽ đi vào bộ định tuyến routing để quyết định xem gói tin có được qua filewall không. Ở đây sẽ có 2 trường hợp:
+	Đầu tiên, khi gói tin đi vào từ mạng sẽ qua chain PREROUTING trước. Tại đây gói tin sẽ qua bảng mangle để thay đổi một số thông tin của header, sau đó đi tới bảng NAT để quyết định xem có thay đổi IP đích không (DNAT), tiếp theo sẽ đi vào bộ định tuyến routing để quyết định xem gói tin có được qua filewall không. Ở đây sẽ có 2 trường hợp:
 
 	- Nếu là local packets thì sẽ được đưa tới chain INPUT. Tại chain INPUT, packets sẽ đi qua bảng mangle và bảng filter để kiểm tra các chính sách (rule), ứng với mỗi rule cụ thể sẽ được áp dụng cho mỗi target, packet có thể được chấp nhận hoặc hủy bỏ. Tiếp theo packet sẽ được chuyển lên cho các ứng dụng (client/server) xử lí local và chuyển ra chain OUTPUT với các bảng mangle, nat, filter, gói tin có thể bị thay đổi các thông số, bị lọc hoặc bị hủy bỏ.
 
@@ -265,3 +269,234 @@ Bạn có thể xem ảnh dưới
 
 Sau khi đi qua chain OUTPUT hoặc FORWARD, gói tin đi tiếp tới chain POSTROUTING (sau khi được định tuyến), tại chain này packets đi qua bảng mangle, nat có thể bị thay đổi ip nguồn (SNAT) hoặc Masquerade trước khi đi ra ngoài mạng
 
+#### Các thao tác, câu lệnh làm việc với IPtables
+
+IPtables thường được cài đặt mặc định trên các hđh linux
+
+CentOS: `yum install iptables`
+
+Ubuntu: `apt-get install iptables`
+
+CentOS 7 sử dụng FirewallD làm tường lửa mặc định thay vì IPtables, nên để sử dụng IPtables thì cần vô hiệu hóa FirewallD và khởi dộng IPtables lên
+
+Disable FirewallD service:
+
+`systemctl mask firewalld`
+
+Active iptables và ip6tables services khi boot:
+
+```
+systemctl enable iptables
+systemctl enable ip6tables
+```
+
+Chuyển đến thư mục /etc/sysconfig và xác định quy tắc của bạn trong các tệp iptables, ip6tables, iptables-config và ip6tables-config.
+
+Stop FirewallD service:
+
+`systemctl stop firewalld`
+
+Start iptables và ip6tables services:
+
+```
+systemctl start iptables
+systemctl start ip6tables
+```
+
+Trên Ubuntu thì ssử dụng ufw, nên ta cần tắt ufw đi để tránh xung đột
+
+`ufw disable`
+
+Trên Ubuntu, IPtables là chuỗi lệnh không phải là 1 services nên bạn không thể start, stop hay restart. Một cách đơn giản để vô hiệu hóa là bạn xóa hết toàn bộ các quy tắc đã thiết lập bằng lệnh flush:
+
+`iptables -F`
+
+Để lưu lại thì cần cài thêm service iptables-presistent vì mặc định khi reload lại máy thì các rules iptables sẽ mất:
+
+```
+apt-get install iptables-presistent
+netfilter-presistent seve
+netfilter-presistent reload
+```
+
+- Bắt đầu với IPtables
+
+Để xem danh sách các rule có trong IPtable thì ta sử dụng câu lệnh `iptables -L -v`. Mặc định thì IPtables sẽ không có bất cứ quy tắc nào cả
+
+Ta có ví dụ 1 số rule như sau:
+
+```
+target		prot		opt		in		out		source		destination
+ACCEPT		all			--		lo		any		anywhere	anywhere
+ACCEPT     	all  		--  	any    	any     anywhere    anywhere		ctstate RELATED,ESTABLISHED
+ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:ssh
+ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:http
+ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:https
+DROP      	all    		--   	any  	any   	anywhere   	anywhere
+```
+
+Để cho dễ hiểu hơn thì ta cùng đi vào phân tích các rule
+
+`ACCEPT		all			--		lo		any		anywhere	anywhere`
+
+rule này sẽ chấp nhận toàn bộ kết nối thông qua thiết bị lo, lo ở đây là "loopback interface", là 1 thiết bị mạng ảo nội bộ, chẳng hạn như IP 127.0.0.1 là kết nối qua thiết bị này
+
+`ACCEPT     	all  		--  	any    	any     anywhere    anywhere		ctstate RELATED,ESTABLISHED`
+
+cho phép giữ lại các kết nối hiện tại, nghĩa là nếu bạn đang có 1 kết nối ssh và sửa đổi lại firewall, nó sẽ không đá bạn ra khỏi ssh nếu bạn không thỏa mãn quy tắc
+
+`ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:ssh`
+
+cho phép kết nối vào ssh server ở bất cứ thiết bị nào và ở bất cứ đâu. Mặc định thì nó sẽ hiển thị dpt:ssh để biểu diễn cổng 22 của ssh, nếu bạn đổi ssh thành cổng khác thì nó sẽ hiện số cổng
+
+`ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:http`
+
+cho phép kết nổi vào cổng 80, mặc định nó sẽ biểu diễn bằng chữ http
+
+`ACCEPT    	tcp    		--   	any  	any   	anywhere   	anywhere    	tcp	dpt:https`
+
+cho phép kết nối vào cổng 443, mặc định nó sẽ biểu diễn bằng chữ https
+
+`DROP      	all    		--   	any  	any   	anywhere   	anywhere`
+
+ngắt các kết nối ở mọi kết nối khác nếu không thuộc những loại trên
+
+- Cách tạo 1 quy tắc mới
+
+Nếu IPtables trên máy bạn chưa được thiết lập thì bạn gõ lệnh `iptables -L -v` nó sẽ trả về kết quả tương tự như dưới đây
+
+<img src="img/04.png">
+
+Tại đoạn trên, bạn sẽ thấy nó được chia ra làm 3 nhóm với 3 kiểu quy tắc đó là:
+
+	- INPUT: áp dụng cho các kết nối đi vào.
+
+	- FORWARD: áp dụng cho các kết nối đã được trỏ đến một vị trí khác.
+
+	- OUTPUT: áp dụng cho các kết nối ra ngoài từ máy chủ.
+
+Vậy, bây giờ chúng ta sẽ thêm 1 quy tắc đơn giản vào IPtables với lệnh sau:
+
+`iptables -A INPUT -i lo -j ACCEPT`
+
+trong đó:
+
+"-A INPUT": khai báo kiểu kết nối sẽ được áp dụng (A nghĩa là Append)
+
+"-i lo": khai báo thiết bị mạng được áp dụng (i nghĩa là interface)
+
+"-j ACCEPT": khai báo hành động sẽ được áp dụng cho quy tắc này (j nghĩa là Jump)
+
+và bây giờ nếu bạn gõ lại lệnh `iptables -L -v` bạn sẽ thấy quy tắc vùa thêm vào sẽ được xuất hiện trong đó
+
+<img src="img/02.jpg">
+
+Sau khi thêm 1 quy tắc hay làm bất cứ việc gì xong, hãy nhớ lưu lại và khởi động lại IPtables để nó áp dụng những thay đổi
+
+```
+service iptables save
+service iptables restart
+```
+
+Tiếp tục bây giờ chúng ta thêm 1 quy tắc để cho phép lưu lại các kết nối hiện tại để tránh việc bị ngắt kết nối khỏi máy chủ
+
+`iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT`
+
+câu lệnh bên trên cũng tương tự như quy tắc ta vừa thêm, nhưng có thêm 2 tham số, đó là:
+
+"-m conntrack": áp dụng cho các kết nối thuộc module tên là "Connection tracking". Module này sẽ có 4 kiểu kết nối là NEW, ESTABLISHED, RELATED và INVALID. Cụ thể là ở quy tắc này ta sẽ sử dụng kiểu RELATED và ESTABLISHED để lọc các kết nối đang truy cập
+
+"-ctstate RELATED,ESTABLISHED": khai báo loại kết nối của module Connection tracking ở bên trên
+
+Và đây là đoạn quy tắc cho phép truy cập cổng 22 cảu ssh`
+
+`iptables -A INPUT -p tcp --dport 22 -j ACCEPT`
+
+"-p tcp": giao thức được áp dụng (ở đây là tcp, còn p nghĩa là protocol)
+
+"--dport 22": cổng cho phép áp dụng (dport nghĩa là destination port)
+
+và cho phép truy cập cổng 80
+
+`iptable -A INPUT -p tcp --dport 80 -j ACCEPT`
+
+Nhưng sẽ khóa toàn bộ các kết nối còn lại
+
+`iptables -A INPUT -j DROP`
+
+- Bổ sung 1 quy tắc
+
+Ở phần tạo quy tắc, ta sử dụng tham số "-A" (tức là Append) để thêm 1 quy tắc mới vào danh sach các quy tắc của iptables, mỗi khi tạo mới 1 quy tắc nó sẽ tự động đưa vào cuối cùng
+
+Nhưng nếu bạn muốn thêm 1 quy tắc và đặt nó vào vị trí nhwu mong muốn thì hãy sử dụng tham số "-I" thay cho "-A", ví dụ như
+
+`iptables -I INPUT 2 -p tcp --dport 443 -j ACCEPT`
+
+trong đó "-I INPUT 2" nghĩa là đặt quy tắc này vào dòng thứ 2 trong danh sách các quy tắc thuộc kiểu INPUT
+
+- Xóa 1 quy tắc
+
+Ở trên thì mình đã nói qua cách thêm 1 quy tắc để cho phép kết nối vào cổng 22 của ssh, nhưng nếu bạn đã đổi cổng ssh rồi thì dĩ nhiên chúng ta sẽ không cần quy tắc này nữa nên ta sẽ xóa nó đi
+
+Trước khi xóa 1 quy tắc thì bạn cần phải xác định được quy tắc này nằm ở hàng thứ mấy và thuộc kiểu nào (INPUT, OUTPUT, FORWARD). Nhập lệnh `iptables -L` để xem và đếm
+
+ví dụ:
+
+```
+Chain INPUT (policy ACCEPT)
+target		prot		opt		source		destination
+ACCEPT		all			--		anywhere	anywhere
+ACCEPT		tcp			--		anywhere	anywhere		tcp dpt:https
+ACCEPT		all			--		anywhere	anywhere		ctstate RELATED,ESTABLISHED
+ACCEPT		tcp			--		anywhere	anywhere		tcp dpt:ssh
+ACCEPT		tcp			--		anywhere	anywhere		tcp dpt:http
+DROP		all			--		anywhere	anywhere
+ 
+Chain FORWARD (policy ACCEPT)
+target		prot		opt		source		destination
+ 
+Chain OUTPUT (policy ACCEPT)
+target		prot		opt		source		destination
+```
+ta thấy rule cho phép ssh qua cổng 22 là ở dòng thứ 4 của chain INPUT, vì vậy ta sẽ xóa dòng thứ 4 đi
+
+`iptables -D INPUT 4`
+
+Ngoài ra, nếu muốn xóa toàn bộ các quy tắc chứa hành động DROP thì có thể sử dụng lệnh sau
+
+`iptables -D INPUT -j DROP`
+
+- Chặn 1 địa chỉ IP
+
+Để chặn 1 địa chỉ ip không cho kết nối đến server, ta cần thêm 1 rule mới vào chain INPUT của table Filter
+
+`iptables -t filter -A INPUT -s <địa chỉ ip> -j REJECT`
+
+hoặc chặn cả 1 dải đại chỉ ip
+
+`iptables -A INPUT -s <dải địa chỉ/subnet mask> -j REJECT`
+
+Tương tự bạn có thể chặn traffic đi tới một IP hoặc 1 dải IP nào đó bằng cách sử dụng OUTPUT chain
+
+`iptables -A OUTPUT -d <đại chỉ ip> -j DROP`
+
+- 1 số các tùy chọn khi sử dụng
+
+| Tùy chọn | Ý nghĩa |
+| --- | --- |
+| -A chain rule | Thêm Rule vào chain |
+| -D [chain] [index] | Xóa rule có chỉ số trong chain đã chọn |
+| -E [chain][new chain] | đổi tên cho chain |
+| -F [chain] | Xóa tất cả các rule trong chain đã chọn, nếu ko chọn chain mặc định sẽ xóa hết rule trong tất cả các chain |
+| -L [chain] | Hiển thị danh sách tất cả các rule trong chain, nếu ko chọn chain thì mặc định nó sẽ hiện hết chain trong một table |
+| -P [chain][target] | Áp dụng chính sách đối với chain |
+| -Z [chain] | Xóa bộ đếm của chain đi |
+| -N [name new chain] |	Tạo một chain mới |
+| -j [target] | dùng để chỉ rõ gói tin sau khi thoải mãn rule sẽ được nhảy đến taret để xử lý |
+| -m [match] | dùng để mở rộng rule đối với với một gói tin (*) |
+| -t [table] | dùng để chọn bảng. nếu bạn không chọn thì mặc định iptable sẽ chọn bảng filter |
+| -p [protocol] | chỉ ra gói tin thuộc loại nào: tcp, udp, icmp,... |
+
+Để xem chi tiết, hãy truy cập trang man iptables bằng cách gõ lệnh
+
+`man iptables`
