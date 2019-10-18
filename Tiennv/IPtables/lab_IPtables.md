@@ -71,3 +71,9 @@
 	`iptables -A INPUT -s 10.10.10.10 -j REJECT`
 	
 	- Cho phép PC2 ra ngoài mạng
+	
+	`iptables -t nat -A POSTROUTING -s 10.10.10.10 -j MASQUERADE`
+	
+	- Lưu cấu hình iptables
+	
+	`service iptables save`
