@@ -180,9 +180,9 @@ nếu muốn xóa bỏ
 
 - Source
 
-LÀ 1 thẻ phân tử trống tùy chọn được sử dụng để liên kết 1 địa chỉ nguồn, dải địa chỉ, địa chỉ MAC hoặc ipset với 1 zone. 1 mục nguồn có chính xác 1 trong những thuộc tính sau
+Là 1 thẻ phân tử trống tùy chọn được sử dụng để liên kết 1 địa chỉ nguồn, dải địa chỉ, địa chỉ MAC hoặc ipset với 1 zone. 1 mục nguồn có chính xác 1 trong những thuộc tính sau
 
-	- nguồn là đại chỉ ip hoặc địa chỉ ip mạng có subnet mask cho IPv4 hoặc IPv6. Địa chỉ phải phù hợp với họ quy tắc (IPv4 / IPv6). Subnet mask được thể hiện bằng các ký hiệu dấu chấm thập phân (/xxxx) hoặc tiền tố mạng (/x) cho IPv4 và ký hiệu tiền tố (/x) cho các địa chỉ mạng IPv6. Có thể đảo ngược ý nghĩa của 1 địa chỉ bằng cách thêm "not" trước "address". Tất cả trừ địa chỉ được chỉ định sẽ được khớp sau đó
+	- nguồn là địa chỉ ip hoặc địa chỉ ip mạng có subnet mask cho IPv4 hoặc IPv6. Địa chỉ phải phù hợp với họ quy tắc (IPv4 / IPv6). Subnet mask được thể hiện bằng các ký hiệu dấu chấm thập phân (/xxxx) hoặc tiền tố mạng (/x) cho IPv4 và ký hiệu tiền tố (/x) cho các địa chỉ mạng IPv6. Có thể đảo ngược ý nghĩa của 1 địa chỉ bằng cách thêm "not" trước "address". Tất cả trừ địa chỉ được chỉ định sẽ được khớp sau đó
 	
 	`address="address[/mask]"`
 	
@@ -238,6 +238,32 @@ systemctl disable firewalld
 
 #### Cấu hình firewalld
 
+Firewalld được cấu hình với các tệp xml. Ngoại trừ các cấu hình rất cụ thể, bạn sẽ không cần đến chúng và thay vào đó nên sử dụng firewall-cmd
+
+Các tệp tin cấu hình được đặt trong 2 thư mục
+	
+	- /usr/lib/firewalld: giữ cấu hình mặc định như các zone default hay các dịch vụ chung. Tránh cập nhật chúng vì những tệp đó sẽ bị ghi đè bởi mỗi bản cập nhật gói tường lửa
+	
+	- /etc/firewalld: giữ tập tin cấu hình hệ thống. Những tập tin này sẽ ghi đè lên 1 cấu hình mặc định
+
+- Quy tắc runtime/permanent
+
+Trong firewalld, các quy tắc được cấu hình thời gian hiệu lực runtime hoặc permanent
+
+	- runtime (mặc định): có tác dụng ngay lập tức, mất hiệu lực khi reboot hệ thống
+	
+	- permanent: không áp dụng cho hệ thống đang chạy, cần reload mới có hiệu lực, vẫn có hiệu lực vĩnh viễn ngay cả khi reboot hệ thống
+
+Ví dụ thêm quy tắc cho cả thiết lập runtime và permanent
+
+```
+firewall-cmd --zone=public --add-service=http
+firewall-cmd --zone=public --add-service=http --permanent
+firewall-cmd --reload
+```
+
+Việc restart/reload sẽ hủy bỏ các thiết lập runtime đồng thời áp dụng thiết lập permanent mà không hề làm mất các kết nối và session hiện tại. Điều này giúp kiểm tra hoạt động của các quy tắc trên tường lửa và dễ dàng khởi động lại nếu có vấn đề xảy ra
+
 - Thiết lập các zones
 
 Liệt kê tất cả các zones trong hệ thống
@@ -249,4 +275,195 @@ Liệt kê tất cả các zones trong hệ thống
 Kiểm tra zone mặc định
 
 `firewall-cmd --get-default-zone`
+
+<img src="img/11.png">
+
+Kiểm tra zone active (được sử dụng bởi network interface)
+
+`firewall-cmd  --get-active-zones`
+
+<img src="img/13.png">
+
+Thay đổi zone mặc định, ví dụ thay đổi thành "home"
+
+`firewall-cmd --set-default-zone=home`
+
+- Các lệnh liệt kê
+
+Liệt kê toàn bộ các quy tắc của các zone
+
+`firewall-cmd --list-all-zones`
+
+Liệt kê toàn bộ các quy tắc trong zone mặc định và zone active
+
+`firewall-cmd --list-all`
+
+<img src="img/14.png">
+
+Liệt kê toàn bộ các quy tắc trong 1 zone cụ thể, ví dụ home
+
+`firewall-cmd --zone=home --list-all`
+
+<img src="img/15.png">
+
+Liệt kê danh sách services/port được cho phép trong zone cụ thể
+
+```
+firewall-cmd --zone=public --list-services
+firewall-cmd --zone=public --list-ports
+```
+
+<img src="img/16.png">
+
+- Thiết lập cho service
+
+Đây chính là điểm khác biệt của firewalld so với IPtables - quản lý thông qua các services. Việc thiết lập tường lửa đã trở nên dễ dàng hơn bao giờ hết - chỉ việc thêm các services vào zone đang sử dụng
+
+Firewalld có thể cho phép lưu lượng dựa trên các quy tắc được xác định trước cho các dịch vụ mạng cụ thể. Bạn có thể tạo quy tắc dịch vụ tùy chỉnh của riêng mình và thêm chúng vào bất kỳ khu vực nào. Các tệp cấu hình cho các dịch vụ được hỗ trợ mặc định được đặt tại /usr/lib/firewalld/services và các tệp dịch vụ do người dùng tạo sẽ nằm trong /etc/firewalld/services
+
+Đầu tiên để xác định các services trên hệ thống
+
+`firewall-cmd --get-services`
+
+Hệ thống thông thường cần cho phép các services sau: ssh(22/TCP), http(80/TCP), https(443/TCP), smtp(25/TCP), smtps(465/TCP) và smtp-submission(587/TCP)
+
+Thiết lập cho phép service trên firewalld, sử dụng "--add-service", ví dụ
+
+```
+firewall-cmd --zone=public --add-service=http
+firewall-cmd --zone=public --add-service=http --permanent
+firewall-cmd --reload
+```
+
+Vô hiệu hóa services trên firewalld, sử dụng "--remove-service"
+
+```
+firewall-cmd --zone=public --remove-service=http
+firewall-cmd --zone=public --remove-service=http --permanent
+firewall-cmd --reload
+```
+
+- Thiết lập cho port
+
+Trong trường hợp bạn thích quản lý theo cách truyền thống qua port, firewalld cũng hỗ trợ bạn điều đó
+
+Mở port với tham số "--add-port"
+
+```
+firewall-cmd --zone=public --add-port=9999/tcp
+firewall-cmd --zone=public --add-port=9999/tcp --permanent
+firewall-cmd --reload
+```
+
+Mở 1 dải port
+
+```
+firewall-cmd --zone=public --add-port=4990-5000/tcp
+firewall-cmd --zone=public --add-port=4990-5000/tcp --permanent
+firewall-cmd --reload
+```
+
+Kiểm tra lại
+
+`firewall-cmd --zone=public --list-ports`
+
+Đóng port với tham số "--remove-port"
+
+```
+firewall-cmd --zone=public --remove-port=9999/tcp
+firewall-cmd --zone=public --remove-port=9999/tcp --permanent
+firewall-cmd --reload
+```
+
+Port forwarding
+
+Ví dụ bên dưới chuyển tiếp lưu lượng truy cập từ cổng 80 đến cổng 12345 trên cùng một máy chủ
+
+`firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=12345`
+
+Nếu muốn chuyển tiếp một port đến 1 máy khác
+
+	- Kích hoạt tính năng masquerade
+	
+	`firewall-cmd --zone=public --add-masquerade`
+	
+	- Thêm quy tắc chuyển tiếp, ví dụ sau chuyển tiếp lưu lượng truy cập từ cổng cục bộ 80 sang cổng 8080 trên máy chủ từ xa có địa chỉ ip 10.10.10.10
+	
+	`firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8080:toaddr=10.10.10.10`
+
+Để loại bỏ các quy tắc, thay thế "--add" bằng "--remove"
+
+`firewall-cmd --zone=public --remove-masquerade`
+
+- Cấu hình nâng cao
+
+Rich rules
+
+Cho phép tất cả lưu lượng ipv4 từ máy chủ 10.10.10.20
+
+`firewall-cmd --zone=public --add-rich-rule 'rule family=ipv4 source address=10.10.10.20 accept'`
+
+Từ chối lưu lượng ipv4 qua tcp từ máy chủ 10.10.10.20 đến cổng 22
+
+`firewall-cmd --zone=public --add-rich-rule 'rule family=ipv4 source address=10.10.10.20 port port=22 protocol=tcp reject'`
+
+Cho phép lưu lượng truy cập ipv4 qua tcp từ máy chủ 10.10.10.20 đến cổng 80 và chuyển tiếp cục bộ sang cổng 8000
+
+`firewall-cmd --zone=public --add-rich-rule 'rule family=ipv4 source address=10.10.10.20 forward-port port=80 protocol=tcp to-port=8000'`
+
+Chuyển tiếp tất cả lưu lượng truy cập ipv4 trên cổng 80 sang cổng 8080 trên máy chủ 10.10.10.20 (tính năng masquerade phải được kích hoạt trên zone)
+
+`firewall-cmd --zone=public --add-rich-rule 'rule family=ipv4 forward-port port=80 protocol=tcp to-port=8080 to-addr=10.10.10.20'`
+
+Để liệt kê rich-rule hiện tại ở zone public
+
+`firewall-cmd --zone=public --list-rich-rules`
+
+- IPtables Direct Interface
+
+Để sử dụng cho các tính năng nâng cao hoặc dành cho các chuyên gia IPtables, firewalld cung cấp giao diện trực tiếp cho phép các lệnh IPtables đuwọc truyền qua nó. Quy tắc giao diện trực tiếp không liên tục trừ khi tham số "--permanent" được sử dụng
+
+Điều này cho phép truy cập trực tiếp hơn vào tường lửa nhưng nó cũng yêu cầu người dùng phải biết các khái niệm iptables/ip6tables/ebtables cơ bản, nghĩa là bảng (filter/mangle/nat/...), chain ( INPUT/OUTPUT/FORWARD/...), lệnh (-A/-D/-I/...), tham số (-p/-s/-d/-j/...) và target (ACCEPT/DROP/REJECT/...). Cấu hình trực tiếp chỉ nên được sử dụng như là phương sách cuối cùng khi không thể sử dụng firewalld.zone
+
+Một tập tin cấu hình trực tiếp tường lửa chứa thông tin về permanent direct chains, các rule và passthrough ...
+
+Đây là cấu trúc của tệp cấu hình trực tiếp
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<direct>
+  [ <chain ipv="ipv4|ipv6|eb" table="table" chain="chain"/> ]
+  [ <rule ipv="ipv4|ipv6|eb" table="table" chain="chain" priority="priority"> args </rule> ]
+  [ <passthrough ipv="ipv4|ipv6|eb"> args </passthrough> ]
+</direct>
+```
+
+trong đó:
+
+	- direct: thẻ bắt đầu và kết thúc bắt buộc, chỉ có thể được sử dụng 1 lần trong tệp cấu hình, không có thuộc tính đi kèm
+
+	- chain: là 1 thẻ phần tử trống tùy chọn, có thể sử dụng nhiều lần, có thể được sử dụng để xác định tên cho chain bổ sung. 1 chain entry có chính xác 3 thuộc tính
+
+	`ipv="ipv4|ipv6|eb"` họ ip nơi chain sẽ được tạo, có thể là ipv4, ipv6 hoặc eb
+	
+	`table="table"` tên bảng nơi chain sẽ được tạo
+	
+	`chain="chain"` tên của chain, sẽ được tạo ra, cần đảm bảo không có chain nào khác có trùng tên
+	
+	- rule: là 1 thẻ phần tử tùy chọn và có thể được sử dụng nhiều lần, có thể được sử dụng để thêm các quy tắc vào 1 built-in hoặc added chain. 1 rule entry có chính xác 4 thuộc tính
+	
+	ngoài 3 thuộc tính giống như bên trên, ở đay còn có thêm `priority="priority"`. Nó được sử dụng để đặt hàng quy tắc. Ưu tiên 0 có nghĩa là thêm quy tắc trên đầu chuỗi, với mức ưu tiên cao hơn, quy tắc sẽ được thêm vào phía dưới. Các quy tắc có cùng mức độ ưu tiên ở cùng cấp độ và thứ tự của các quy tắc này không cố định và có thể thay đổi. Nếu bạn muốn đảm bảo rằng 1 quy tắc sẽ được thêm vào sau 1 quy tắc khác, hãy sử dụng mức ưu tiên thấp cho lần đầu tiên và cao hơn cho quy tắc sau
+	
+	- passthrough: là 1 thẻ tùy chọn và có thể được sử dụng nhiều lần. Nó có thể được sử dụng để thêm các quy tắc vào built-in hoặc added chain. 1 rule entry chỉ có chính xác 1 thuộc tính là
+	
+	`ipv="ipv4|ipv6|eb"`
+	
+	Quy tắc passthrough sẽ được thêm trực tiếp vào chain. Không có cơ chế như quy tắc direct như trên. Người sử dụng phải đảm bảo passthrough sẽ không có xung đột với các quy tắc được tạo bởi firewalld.
+	
+Để xem tất cả các chain hoặc rule tùy chỉnh được thêm vào firewalld
+
+```
+firewall-cmd --direct --get-all-chains
+firewall-cmd --direct --get-all-rules
+```
 
